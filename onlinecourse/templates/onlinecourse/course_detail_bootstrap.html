@@ -50,7 +50,37 @@
                     </div>
                 {% endfor %}
             </div>
-            <!-- Course detail template changes go here -->
+            {% if user.is_authenticated %}
+            {% if is_enrolled %}
+            <h3 class="mt-4">Exam</h3>
+            <form method="post" action="{% url 'onlinecourse:submit' course.id %}">
+                {% csrf_token %}
+                {% for question in questions %}
+                <div class="card mt-3">
+                    <div class="card-header">{{ forloop.counter }}. {{ question.question_text }}</div>
+                    <div class="card-body">
+                        {% for choice in question.choices.all %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="choice{{ question.id }}" value="{{ choice.id }}" id="choice{{ choice.id }}">
+                            <label class="form-check-label" for="choice{{ choice.id }}">{{ choice.choice_text }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% if questions %}
+                <button class="btn btn-primary mt-3" type="submit">Submit Exam</button>
+                {% else %}
+                <p>No exam questions have been added yet. Add questions in Django admin.</p>
+                {% endif %}
+            </form>
+            {% else %}
+            <p class="mt-3">Enroll in this course to take the exam.</p>
+            <a class="btn btn-primary" href="{% url 'onlinecourse:enroll' course.id %}">Enroll</a>
+            {% endif %}
+            {% else %}
+            <p class="mt-3">Please log in and enroll to take the exam.</p>
+            {% endif %}
     </div>
 </body>
 </html>
